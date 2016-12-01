@@ -24,7 +24,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QtGui/QGroupBox>
+#include <QGroupBox>
 #include <QtGui/QPixmap>
 
 namespace UFW

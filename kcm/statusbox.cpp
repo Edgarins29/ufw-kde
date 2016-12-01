@@ -22,8 +22,8 @@
  */
 
 #include "statusbox.h"
-#include <KDE/KIcon>
-#include <KDE/KIconEffect>
+#include <QIcon>
+//#include <KIconEffect>
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
 
@@ -49,16 +49,16 @@ StatusBox::StatusBox(const QString &title, QWidget *parent)
 
 void StatusBox::init()
 {
-    QImage off=KIcon("security-low").pixmap(constIconSize, constIconSize, QIcon::Normal).toImage(),
-           on=KIcon("security-high").pixmap(constIconSize, constIconSize, QIcon::Normal).toImage();
+    QImage off=QIcon("security-low").pixmap(constIconSize, constIconSize, QIcon::Normal).toImage(),
+           on=QIcon("security-high").pixmap(constIconSize, constIconSize, QIcon::Normal).toImage();
 
-    KIconEffect::deSaturate(off, 0.8);
+    //KIconEffect::deSaturate(off, 0.8);
     //KIconEffect::deSaturate(on, 0.1);
-    KIconEffect::semiTransparent(off);
-    KIconEffect::semiTransparent(off);
-    KIconEffect::semiTransparent(off);
-    KIconEffect::semiTransparent(on);
-    KIconEffect::semiTransparent(on);
+    //KIconEffect::semiTransparent(off);
+    //KIconEffect::semiTransparent(off);
+    //KIconEffect::semiTransparent(off);
+    //KIconEffect::semiTransparent(on);
+    //KIconEffect::semiTransparent(on);
     pixmaps[0]=QPixmap::fromImage(off);
     pixmaps[1]=QPixmap::fromImage(on);
     setContentsMargins(0, 0, 0, 0);

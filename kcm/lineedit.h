@@ -24,14 +24,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <KDE/KLineEdit>
+#include <QLineEdit>
 
 class QRadioButton;
 
 namespace UFW
 {
 
-class LineEdit : public KLineEdit
+class LineEdit : public QLineEdit
 {
     public:
 

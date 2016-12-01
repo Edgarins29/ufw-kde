@@ -24,13 +24,13 @@
 #include "lineedit.h"
 #include <QtCore/QEvent>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QRadioButton>
+#include <QRadioButton>
 
 namespace UFW
 {
 
 LineEdit::LineEdit(QWidget *parent)
-        : KLineEdit(parent)
+        : QLineEdit(parent)
         , radioButton(0L)
         , mousePressed(false)
 {

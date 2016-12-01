@@ -73,7 +73,7 @@ ActionReply Helper::query(const QVariantMap &args)
 
     if(args["profiles"].toBool()) {
         QDir dir(KCM_UFW_DIR);
-        QStringList profiles=dir.entryList(QStringList() << "*"PROFILE_EXTENSION);
+        QStringList profiles=dir.entryList(QStringList() << "*" PROFILE_EXTENSION);
         QMap<QString, QVariant> data;
         foreach (const QString &profile, profiles) {
             QFile f(dir.canonicalPath()+QChar('/')+profile);
@@ -118,8 +118,8 @@ ActionReply Helper::viewlog(const QVariantMap &args)
     }
     else
     {
-        reply=ActionReply::HelperErrorReply;
-        reply.setErrorCode(STATUS_OPERATION_FAILED);
+        reply=ActionReply::HelperErrorReply();
+        reply.setErrorCode(KAuth::ActionReply::Error());
     }
 
     return reply;
@@ -158,8 +158,8 @@ ActionReply Helper::modify(const QVariantMap &args)
     else if("deleteProfile"==cmd)
         return deleteProfile(args, cmd);
 
-    ActionReply reply=ActionReply::HelperErrorReply;
-    reply.setErrorCode(STATUS_INVALID_CMD);
+    ActionReply reply=ActionReply::HelperErrorReply();
+    reply.setErrorCode(KAuth::ActionReply::Error());
     return reply;
 }
 
@@ -206,8 +206,9 @@ ActionReply Helper::setProfile(const QVariantMap &args, const QString &cmd)
 
     if(cmdArgs.isEmpty())
     {
-        ActionReply reply=ActionReply::HelperErrorReply;
-        reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+        ActionReply reply=ActionReply::HelperErrorReply();
+        //reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+        reply.setErrorCode(KAuth::ActionReply::Error());
         return reply;
     }
     else
@@ -228,8 +229,9 @@ ActionReply Helper::saveProfile(const QVariantMap &args, const QString &cmd)
 
     if(name.isEmpty() || xml.isEmpty())
     {
-        reply=ActionReply::HelperErrorReply;
-        reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+        reply=ActionReply::HelperErrorReply();
+        //reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+        reply.setErrorCode(KAuth::ActionReply::Error());
     }
     else
     {
@@ -245,14 +247,15 @@ ActionReply Helper::saveProfile(const QVariantMap &args, const QString &cmd)
         }
         else
         {
-            reply=ActionReply::HelperErrorReply;
-            reply.setErrorCode(STATUS_OPERATION_FAILED);
+            reply=ActionReply::HelperErrorReply();
+            //reply.setErrorCode(STATUS_OPERATION_FAILED);
+            reply.setErrorCode(KAuth::ActionReply::Error());
         }
     }
 
     reply.addData("cmd", cmd);
     reply.addData("name", name);
-    reply.addData("profiles", QDir(KCM_UFW_DIR).entryList(QStringList() << "*"PROFILE_EXTENSION));
+    reply.addData("profiles", QDir(KCM_UFW_DIR).entryList(QStringList() << "*" PROFILE_EXTENSION));
     return reply;
 }
 
@@ -265,18 +268,20 @@ ActionReply Helper::deleteProfile(const QVariantMap &args, const QString &cmd)
 
     if(name.isEmpty())
     {
-        reply=ActionReply::HelperErrorReply;
-        reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+        reply=ActionReply::HelperErrorReply();
+        //reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+        reply.setErrorCode(KAuth::ActionReply::Error());
     }
     else if(!QFile::remove(QString(KCM_UFW_DIR)+"/"+name+PROFILE_EXTENSION))
     {
-        reply=ActionReply::HelperErrorReply;
-        reply.setErrorCode(STATUS_OPERATION_FAILED);
+        reply=ActionReply::HelperErrorReply();
+        //reply.setErrorCode(STATUS_OPERATION_FAILED);
+        reply.setErrorCode(KAuth::ActionReply::Error());
     }
 
     reply.addData("cmd", cmd);
     reply.addData("name", name);
-    reply.addData("profiles", QDir(KCM_UFW_DIR).entryList(QStringList() << "*"PROFILE_EXTENSION));
+    reply.addData("profiles", QDir(KCM_UFW_DIR).entryList(QStringList() << "*" PROFILE_EXTENSION));
     return reply;
 }
 
@@ -294,8 +299,9 @@ ActionReply Helper::addRules(const QVariantMap &args, const QString &cmd)
         checkFolder();
         return run(cmdArgs, QStringList() << "--list", cmd);
     }
-    ActionReply reply=ActionReply::HelperErrorReply;
-    reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+    ActionReply reply=ActionReply::HelperErrorReply();
+    //reply.setErrorCode(STATUS_INVALID_ARGUMENTS);
+    reply.setErrorCode(KAuth::ActionReply::Error());
     return reply;
 }
 
@@ -356,8 +362,9 @@ ActionReply Helper::run(const QStringList &args, const QString &cmd)
 
     if(0!=exitCode)
     {
-        reply=ActionReply::HelperErrorReply;
-        reply.setErrorCode(exitCode);
+        reply=ActionReply::HelperErrorReply();
+        //reply.setErrorCode(exitCode);
+        //reply.addData("errorDescription", file.errorString());
         reply.addData("response", ufw.readAllStandardError());
     }
     else
@@ -368,4 +375,4 @@ ActionReply Helper::run(const QStringList &args, const QString &cmd)
 
 }
 
-KDE4_AUTH_HELPER_MAIN("org.kde.ufw", UFW::Helper)
+KAUTH_HELPER_MAIN("org.kde.ufw", UFW::Helper)

@@ -24,7 +24,7 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QtGui/QStackedWidget>
+#include <QStackedWidget>
 #include <QtGui/QPixmap>
 
 namespace UFW

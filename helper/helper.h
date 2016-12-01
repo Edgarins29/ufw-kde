@@ -24,9 +24,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QtCore/QObject>
-#include <QtCore/QVariantMap>
-#include <kauth.h>
+//#include <QtCore/QVariantMap>
+#include <KAuth>
 
 class QStringList;
 class QByteArray;

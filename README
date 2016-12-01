@@ -35,7 +35,7 @@ To build and install:
 
 1. mkdir build
 2. cd build
-3. cmake .. -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix`
+3. cmake .. -DCMAKE_INSTALL_PREFIX=`kde5-config --prefix`
 4. make
 5. sudo make install
 

@@ -22,7 +22,7 @@
  */
 
 #include "types.h"
-#include <KDE/KLocale>
+#include <KLocalizedString>
 #include <QtCore/QVariantMap>
 
 namespace UFW

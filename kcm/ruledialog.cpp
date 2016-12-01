@@ -27,17 +27,18 @@
 #include "strings.h"
 #include "combobox.h"
 #include <limits.h>
-#include <KDE/KConfigGroup>
-#include <KDE/KGlobal>
-#include <KDE/KLocale>
-#include <KDE/KIcon>
-#include <KDE/KMessageBox>
+#include <KConfigGroup>
+#include <KSharedConfig>
+#include <KLocalizedString>
+#include <QIcon>
+#include <KMessageBox>
 #include <QtGui/QValidator>
-#include <QtGui/QButtonGroup>
+#include <QButtonGroup>
 #include <QtNetwork/QNetworkInterface>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <QDialogButtonBox>
 
 namespace UFW
 {
@@ -421,27 +422,32 @@ static void setProfileIndex(QComboBox *combo, const QString &str)
 }
 
 RuleDialog::RuleDialog(Kcm *parent, bool isEditDlg)
-          : KDialog(parent)
+          : QDialog(parent)
           , kcm(parent)
           , isEdit(isEditDlg)
 {
-    QWidget *mainWidet=new QWidget(this);
+    QWidget *mainWidget=new QWidget(this);
     if(isEdit)
     {
+        /*
         setButtons(Help|Ok|Cancel);
         setCaption(i18n("Edit Rule"));
         setHelp("add_and_edit_rules", "ufw");
+        */
+        //QDialogButtonBox buttonBox = new QDialogButtonBox(QDialogButtonBox::Help
+        //                            | QDialogButtonBox::Ok
+        //                             | QDialogButtonBox::Cancel);
     }
     else
     {
-        setButtons(Help|Apply|Close);
-        setButtonText(Apply, i18n("Add"));
-        setButtonIcon(Apply, KIcon("list-add"));
-        setCaption(i18n("Add Rule"));
-        setHelp("add_and_edit_rules", "ufw");
+        //setButtons(Help|Apply|Close);
+        //setButtonText(Apply, i18n("Add"));
+        //setButtonIcon(Apply, KIcon("list-add"));
+        //setCaption(i18n("Add Rule"));
+        //setHelp("add_and_edit_rules", "ufw");
     }
-    setupUi(mainWidet);
-    setMainWidget(mainWidet);
+    setupUi(mainWidget);
+    //setMainWidget(mainWidget);
 
     addRuleTypes(ruleType);
     addPolicies(simplePolicy);
@@ -492,7 +498,7 @@ RuleDialog::RuleDialog(Kcm *parent, bool isEditDlg)
 
     controlSimpleProtocol();
 
-    KConfigGroup grp(KGlobal::config(), CFG_GROUP);
+    KConfigGroup grp(KSharedConfig::openConfig(), CFG_GROUP);
     int          rt=grp.readEntry(CFG_RULE_TYPE, (int)0);
 
     ruleType->setCurrentIndex(RT_SIMPLE==rt || RT_ADVANCED==rt ? rt : RT_SIMPLE);
@@ -598,7 +604,7 @@ RuleDialog::RuleDialog(Kcm *parent, bool isEditDlg)
 
 RuleDialog::~RuleDialog()
 {
-    KConfigGroup grp(KGlobal::config(), CFG_GROUP);
+    KConfigGroup grp(KSharedConfig::openConfig(), CFG_GROUP);
 
     grp.writeEntry(CFG_RULE_TYPE, ruleType->currentIndex());
     grp.writeEntry(CFG_SIZE, size());

@@ -22,8 +22,8 @@
  */
 
 #include "stackedwidget.h"
-#include <KDE/KIcon>
-#include <KDE/KIconEffect>
+#include <QIcon>
+//#include <KDE/KIconEffect>
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
 
@@ -36,13 +36,13 @@ static const int constBorder   = 0;
 StackedWidget::StackedWidget(QWidget *parent)
              : QStackedWidget(parent)
 {
-    QImage img=KIcon("security-high").pixmap(constIconSize, constIconSize, QIcon::Normal).toImage();
+    QImage img=QIcon("security-high").pixmap(constIconSize, constIconSize, QIcon::Normal).toImage();
 
-    KIconEffect::deSaturate(img, 0.5);
-    KIconEffect::semiTransparent(img);
-    KIconEffect::semiTransparent(img);
-    KIconEffect::semiTransparent(img);
-    KIconEffect::semiTransparent(img);
+    //KIconEffect::deSaturate(img, 0.5);
+    //KIconEffect::semiTransparent(img);
+    //KIconEffect::semiTransparent(img);
+    //KIconEffect::semiTransparent(img);
+    //KIconEffect::semiTransparent(img);
     pixmap=QPixmap::fromImage(img);
 }
 

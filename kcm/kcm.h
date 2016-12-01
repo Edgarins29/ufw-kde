@@ -24,13 +24,17 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <KDE/KCModule>
-#include <kauth.h>
+//#include <KDE/KCModule>
+#include <KCModule>
+//#include <kauth.h>
+#include <KAuth>
+//#include <kauthaction.h>
 #include <QtCore/QSet>
 #include <QtCore/QMap>
-#include <QtGui/QMenu>
-#include <QtGui/QAction>
-#include <QtGui/QCheckBox>
+#include <QNetworkInterface>
+//#include <QtGui/QMenu>
+//#include <QtGui/QAction>
+//#include <QtGui/QCheckBox>
 #include "types.h"
 #include "rule.h"
 #include "profile.h"

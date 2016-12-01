@@ -25,16 +25,17 @@
 #include "types.h"
 #include "rule.h"
 #include "kcm.h"
-#include <kdeversion.h>
-#include <KDE/KAction>
-#include <KDE/KToolBar>
-#include <KDE/KConfig>
-#include <KDE/KConfigGroup>
-#include <KDE/KGlobal>
-#include <KDE/KLocale>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QTreeWidget>
-#include <QtGui/QHeaderView>
+//#include <kdeversion.h>
+#include <QAction>
+#include <QToolBar>
+#include <KConfig>
+#include <QLocale>
+#include <KConfigGroup>
+#include <KSharedConfig>
+#include <KLocalizedString>
+#include <QVBoxLayout>
+#include <QTreeWidget>
+#include <QHeaderView>
 #include <QtCore/QTimer>
 
 namespace UFW
@@ -96,15 +97,17 @@ static QString parseDate(const QString &monthStr, const QString &dayStr, const Q
         {
             QDateTime dateTime(QDate(QDate::currentDate().year(), month, day), QTime(h, m, s));
             if (dateTime.isValid())
-                return KGlobal::locale()->formatDateTime(dateTime, KLocale::ShortDate, true);
+                //return KConfig::locale()->formatDateTime(dateTime, QLocale::shortDate, true);
+                return "";
         }
+
     }
 
     return monthStr+QChar(' ')+dayStr+QChar(' ')+timeStr;
 }
 
 LogViewer::LogViewer(Kcm *p)
-         : KDialog(p)
+         : QDialog(p)
          , kcm(p)
          , headerSizesSet(false)
 {
@@ -114,7 +117,7 @@ LogViewer::LogViewer(Kcm *p)
     // Can't restore QHeaderView in constructor, so use a timer - and restore after eventloop starts.
     QTimer::singleShot(0, this, SLOT(restoreState()));
 
-    KConfigGroup grp(KGlobal::config(), CFG_GROUP);
+    KConfigGroup grp(KSharedConfig::openConfig(), CFG_GROUP);
     QSize        sz=grp.readEntry(CFG_SIZE, QSize(800, 400));
 
     if(sz.isValid())
@@ -123,7 +126,7 @@ LogViewer::LogViewer(Kcm *p)
 
 LogViewer::~LogViewer()
 {
-    KConfigGroup grp(KGlobal::config(), CFG_GROUP);
+    KConfigGroup grp(KSharedConfig::openConfig(), CFG_GROUP);
     grp.writeEntry(CFG_LIST_STATE, list->header()->saveState());
     grp.writeEntry(CFG_SHOW_RAW, toggleRawAction->isChecked());
     grp.writeEntry(CFG_SIZE, size());
@@ -131,7 +134,7 @@ LogViewer::~LogViewer()
 
 void LogViewer::restoreState()
 {
-    KConfigGroup grp(KGlobal::config(), CFG_GROUP);
+    KConfigGroup grp(KSharedConfig::openConfig(), CFG_GROUP);
     QByteArray state=grp.readEntry(CFG_LIST_STATE, QByteArray());
     if(!state.isEmpty())
     {
@@ -187,11 +190,11 @@ void LogViewer::setupWidgets()
 {
     QWidget     *mainWidget=new QWidget(this);
     QVBoxLayout *layout=new QVBoxLayout(mainWidget);
-    KToolBar    *toolbar=new KToolBar(mainWidget);
-    KAction     *refreshAction=new KAction(KIcon("view-refresh"), i18n("Refresh"), this);
-    toggleRawAction=new KAction(KIcon("flag-red"), i18n("Display Raw"), this);
+    QToolBar    *toolbar=new QToolBar(mainWidget);
+    QAction     *refreshAction=new QAction(QIcon("view-refresh"), i18n("Refresh"), this);
+    toggleRawAction=new QAction(QIcon("flag-red"), i18n("Display Raw"), this);
     toggleRawAction->setCheckable(true);
-    createRuleAction=new KAction(KIcon("list-add"), i18n("Create Rule"), this);
+    createRuleAction=new QAction(QIcon("list-add"), i18n("Create Rule"), this);
     connect(toggleRawAction, SIGNAL(toggled(bool)), SLOT(toggleDisplay()));
     connect(refreshAction, SIGNAL(triggered(bool)), SLOT(refresh()));
     connect(createRuleAction, SIGNAL(triggered(bool)), SLOT(createRule()));
@@ -211,9 +214,9 @@ void LogViewer::setupWidgets()
     list->setAllColumnsShowFocus(true);
     layout->addWidget(toolbar);
     layout->addWidget(list);
-    setMainWidget(mainWidget);
-    setCaption(i18n("Log Viewer"));
-    setButtons(KDialog::Close);
+    //setMainWidget(mainWidget);
+    //setCaption(i18n("Log Viewer"));
+    //setButtons(QDialog::Close);
     
     connect(list, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
     selectionChanged();
@@ -221,13 +224,13 @@ void LogViewer::setupWidgets()
 
 void LogViewer::setupActions()
 {
-    viewAction=KAuth::Action("org.kde.ufw.viewlog");
-    viewAction.setHelperID("org.kde.ufw");
-#if KDE_IS_VERSION(4, 5, 90)
-    viewAction.setParentWidget(this);
-#endif
+   // viewAction=kauthAction("org.kde.ufw.viewlog");
+    //viewAction.setHelperID("org.kde.ufw");
+//#if KDE_IS_VERSION(4, 5, 90)
+    //viewAction.setParentWidget(this);
+//#endif
 //     queryAction.setExecutesAsync(true);
-    connect(viewAction.watcher(), SIGNAL(actionPerformed(ActionReply)), SLOT(queryPerformed(ActionReply)));
+    //connect(viewAction.watcher(), SIGNAL(actionPerformed(ActionReply)), SLOT(queryPerformed(ActionReply)));
 }
 
 void LogViewer::parse(const QString &line)

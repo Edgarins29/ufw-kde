@@ -25,7 +25,7 @@
 #include <QtCore/QEvent>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QRadioButton>
+#include <QRadioButton>
 
 namespace UFW
 {

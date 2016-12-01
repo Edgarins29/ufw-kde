@@ -28,19 +28,24 @@
 #include "types.h"
 #include "strings.h"
 #include "statusbox.h"
-#include <KDE/KAboutData>
-#include <KDE/KLocale>
-#include <KDE/KMessageBox>
-#include <KDE/KPluginFactory>
-#include <KDE/KColorScheme>
-#include <KDE/KFileDialog>
-#include <KDE/KInputDialog>
-#include <KDE/KStandardDirs>
-#include <KDE/KTemporaryFile>
-#include <KDE/KIO/NetAccess>
-#include <QtGui/QLabel>
-#include <QtGui/QTreeWidget>
-#include <QtGui/QValidator>
+#include <KAboutData>
+//#include <KDE/KLocale>
+#include <KLocalizedString>
+#include <KMessageBox>
+#include <KPluginFactory>
+#include <KColorScheme>
+#include <KAboutData>
+#include <QFileDialog>
+#include <QMenu>
+#include <QInputDialog>
+#include <QStandardPaths>
+#include <QTemporaryFile>
+//#include <QNetwork>
+//#include <KDEKIO/NetAccess>
+//#include <KIO>
+//#include <QtGui/QLabel>
+//#include <QtGui/QTreeWidget>
+//#include <QtGui/QValidator>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QMap>
@@ -178,7 +183,10 @@ static void addModule(QTreeWidget *tree, const KernelModule &mod)
 
 static inline QString profileFileName(const QString &name)
 {
-    return KGlobal::dirs()->saveLocation("data", FOLDER"/", KStandardDirs::NoDuplicates)+name+EXTENSION;
+    //return QStandardPaths::dirs()->saveLocation("data", FOLDER"/")+name+EXTENSION;
+    //return QStandardPaths::locate(QStandardPaths::DataLocation, FOLDER"/"+name+EXTENSION);
+    const QString * ret = &name;
+    return *ret;
 }
 
 static inline QString profileName(const QAction *profile)
@@ -187,18 +195,30 @@ static inline QString profileName(const QAction *profile)
 }
 
 Kcm::Kcm(QWidget *parent, const QVariantList&)
-   : KCModule(UfwFactory::componentData(), parent)
+   : KCModule( parent)
    , addDialog(0L)
    , editDialog(0L)
    , moveToPos(0)
    , logViewer(0L)
 {
     setButtons(Help|Default);
-
-    KAboutData *about = new KAboutData("kcm_ufw", 0, ki18n("UFW Settings"), VERSION, ki18n("GUI front-end for Uncomplicated FireWall"),
-                                       KAboutData::License_GPL, ki18n("(C) Craig Drummond, 2011"), KLocalizedString(), QByteArray(),
+    /*
+    KAboutData *about = new KAboutData(QStringLiteral(""),i18n("kcm_ufw"), 0, i18n("UFW Settings"), VERSION, i18n("GUI front-end for Uncomplicated FireWall"),
+                                       KAboutLicense::GPL_V3, i18n("(C) Craig Drummond, 2011"), QString(), QByteArray(),
                                        "craig.p.drummond@gmail.com");
-    about->addAuthor(ki18n("Craig Drummond"), ki18n("Developer and maintainer"), "craig.p.drummond@gmail.com");
+    about->addAuthor(i18n("Craig Drummond"), i18n("Developer and maintainer"), i18n("craig.p.drummond@gmail.com");
+    */
+    
+    KAboutData *about = new KAboutData(QStringLiteral("kcm_ufw"),
+                                     i18n("kcm_ufw"),
+                                     "0.5.1",
+                                     i18n("KDE UFW Control Module"),
+                                     KAboutLicense::GPL_V3,
+                                     QStringLiteral("Copyright (C) 2011 Craig Drummond"),
+                                     QStringLiteral(),
+                                     //QStringLiteral("https://projects.kde.org/projects/playground/sysadmin/systemd-kcm/"));
+                                     QStringLiteral(""));
+                about->addAuthor(QStringLiteral("Craig Drummond"), i18n("Developer and maintainer"), QStringLiteral("craig.p.drummond@gmail.com"));
     setAboutData(about);
 
     setupUi(this);
@@ -211,8 +231,8 @@ Kcm::~Kcm()
 {
     // Disconnect from KAuth signals, as there might be an action in flight - and we can no longer handle this, due to
     // being terminated!!!
-    disconnect(queryAction.watcher(), SIGNAL(actionPerformed(ActionReply)), this, SLOT(queryPerformed(ActionReply)));
-    disconnect(modifyAction.watcher(), SIGNAL(actionPerformed(ActionReply)), this, SLOT(modifyPerformed(ActionReply)));
+    //disconnect(qjob, SIGNAL(actionPerformed(ActionReply)), this, SLOT(queryPerformed(ActionReply)));
+    //disconnect(mjob, SIGNAL(actionPerformed(ActionReply)), this, SLOT(modifyPerformed(ActionReply)));
 }
 
 bool Kcm::addRules(const QList<Rule> &rules)
@@ -670,8 +690,9 @@ void Kcm::removeProfile(QAction *profile)
 
 void Kcm::importProfile()
 {
-    KUrl url=KFileDialog::getOpenUrl(KUrl(), i18n("*.ufw|Firewall Settings"), this);
-
+    QUrl url=QFileDialog::getOpenFileUrl(this, i18n("*.ufw|Firewall Settings"), QUrl());
+    // Need to port it to KIO::storedGet + KJobWidgets::setWindow + job->exec() instead 
+/*
     if(!url.isEmpty())
     {
         QString tempFile;
@@ -695,15 +716,17 @@ void Kcm::importProfile()
         else
             KMessageBox::error(this, KIO::NetAccess::lastErrorString());
     }
+    */
 }
 
 void Kcm::exportProfile()
 {
-    KUrl url=KFileDialog::getSaveUrl(KUrl(), i18n("*.ufw|Firewall Settings"), this, QString(), KFileDialog::ConfirmOverwrite);
-
+    QUrl url=QFileDialog::getSaveFileUrl(this, i18n("*.ufw|Firewall Settings"), QUrl(), QString());
+    // Need to port it to KIO::storedGet + KJobWidgets::setWindow + job->exec() instead 
+/*
     if(!url.isEmpty())
     {
-        KTemporaryFile tempFile;
+        QTemporaryFile tempFile;
 
         tempFile.setAutoRemove(true);
 
@@ -724,6 +747,7 @@ void Kcm::exportProfile()
         else
             KMessageBox::error(this, i18n("Failed to create temporary file."));
     }
+    */
 }
 
 void Kcm::loadMenuShown()
@@ -755,7 +779,7 @@ QString Kcm::getNewProfileName(const QString &currentName, bool isImport)
     {
         if(promptForName)
         {
-            name=KInputDialog::getText(i18n("Profile Name"), i18n("Please enter a name for the profile:"), name, 0, this, &validator);
+            name=QInputDialog::getText(this, i18n("Profile Name"), i18n("Please enter a name for the profile:"));
             name.trimmed().simplified();
         }
 
@@ -785,7 +809,8 @@ QString Kcm::getNewProfileName(const QString &currentName, bool isImport)
 
 void Kcm::listUserProfiles()
 {
-    QStringList                files(KGlobal::dirs()->findAllResources("data", FOLDER"/*"EXTENSION, KStandardDirs::NoDuplicates));
+    /*
+    QStringList                files(QStandardPaths::locate("data", FOLDER "/ *" EXTENSION);
     QStringList::ConstIterator it(files.constBegin()),
                                end(files.constEnd());
 
@@ -805,6 +830,7 @@ void Kcm::listUserProfiles()
         loadMenu->addAction(noProfilesAction);
         deleteMenu->addAction(noProfilesAction);
     }
+    */
 
     sortActions();
     showCurrentStatus();
@@ -1115,23 +1141,23 @@ void Kcm::setupWidgets()
     connect(ruleList, SIGNAL(itemSelectionChanged()), SLOT(ruleSelectionChanged()));
     connect(ruleList, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), SLOT(ruleDoubleClicked(QTreeWidgetItem *, int)));
     connect(modulesList, SIGNAL(itemClicked(QTreeWidgetItem *, int)), SLOT(moduleClicked(QTreeWidgetItem *, int)));
-    addRuleButton->setIcon(KIcon("list-add"));
-    editRuleButton->setIcon(KIcon("document-edit"));
-    removeRuleButton->setIcon(KIcon("list-remove"));
-    moveRuleUpButton->setIcon(KIcon("arrow-up"));
-    moveRuleDownButton->setIcon(KIcon("arrow-down"));
-    refreshButton->setIcon(KIcon("view-refresh"));
-    profilesButton->setIcon(KIcon("document-multiple"));
-    logButton->setIcon(KIcon("text-x-log"));
+    addRuleButton->setIcon(QIcon("list-add"));
+    editRuleButton->setIcon(QIcon("document-edit"));
+    removeRuleButton->setIcon(QIcon("list-remove"));
+    moveRuleUpButton->setIcon(QIcon("arrow-up"));
+    moveRuleDownButton->setIcon(QIcon("arrow-down"));
+    refreshButton->setIcon(QIcon("view-refresh"));
+    profilesButton->setIcon(QIcon("document-multiple"));
+    logButton->setIcon(QIcon("text-x-log"));
 
     QMenu *profilesMenu=new QMenu(this);
     noProfilesAction=new QAction(i18n("No Saved Profiles"), this);
     noProfilesAction->setEnabled(false);
-    profilesMenu->addAction(KIcon("document-save"), i18n("Save Current Settings..."), this, SLOT(saveProfile()));
-    loadMenu=profilesMenu->addMenu(KIcon("document-open"), i18n("Load Profile"));
-    deleteMenu=profilesMenu->addMenu(KIcon("edit-delete"), i18n("Delete Profile"));
-    profilesMenu->addAction(KIcon("document-import"), i18n("Import..."), this, SLOT(importProfile()));
-    profilesMenu->addAction(KIcon("document-export"), i18n("Export..."), this, SLOT(exportProfile()));
+    profilesMenu->addAction(QIcon("document-save"), i18n("Save Current Settings..."), this, SLOT(saveProfile()));
+    loadMenu=profilesMenu->addMenu(QIcon("document-open"), i18n("Load Profile"));
+    deleteMenu=profilesMenu->addMenu(QIcon("edit-delete"), i18n("Delete Profile"));
+    profilesMenu->addAction(QIcon("document-import"), i18n("Import..."), this, SLOT(importProfile()));
+    profilesMenu->addAction(QIcon("document-export"), i18n("Export..."), this, SLOT(exportProfile()));
     profilesButton->setMenu(profilesMenu);
     ruleList->setDragEnabled(true);
     ruleList->viewport()->setAcceptDrops(true);
@@ -1166,21 +1192,25 @@ void Kcm::setupWidgets()
 
 void Kcm::setupActions()
 {
-    queryAction=KAuth::Action("org.kde.ufw.query");
-    queryAction.setHelperID("org.kde.ufw");
-#if KDE_IS_VERSION(4, 5, 90)
+    queryAction = authAction();
+    //queryAction=authAction("org.kde.ufw.query");
+    queryAction.setHelperId("org.kde.ufw");
+/*#if KDE_IS_VERSION(4, 5, 90)
     queryAction.setParentWidget(this);
-#endif
+#endif */
 //     queryAction.setExecutesAsync(true);
-    connect(queryAction.watcher(), SIGNAL(actionPerformed(ActionReply)), SLOT(queryPerformed(ActionReply)));
+    KAuth::ExecuteJob *qjob = queryAction.execute();
+    connect(qjob, SIGNAL(actionPerformed(ActionReply)), SLOT(queryPerformed(ActionReply)));
 
-    modifyAction=KAuth::Action("org.kde.ufw.modify");
-    modifyAction.setHelperID("org.kde.ufw");
-#if KDE_IS_VERSION(4, 5, 90)
+    //modifyAction=authAction("org.kde.ufw.modify");
+    modifyAction=authAction();
+    modifyAction.setHelperId("org.kde.ufw");
+/*#if KDE_IS_VERSION(4, 5, 90)
     modifyAction.setParentWidget(this);
-#endif
+#endif */
 //     modifyAction.setExecutesAsync(true);
-    connect(modifyAction.watcher(), SIGNAL(actionPerformed(ActionReply)), SLOT(modifyPerformed(ActionReply)));
+    KAuth::ExecuteJob *mjob = modifyAction.execute();
+    connect(mjob, SIGNAL(actionPerformed(ActionReply)), SLOT(modifyPerformed(ActionReply)));
 }
 
 void Kcm::addModules()

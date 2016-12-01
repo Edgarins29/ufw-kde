@@ -24,12 +24,12 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <kauth.h>
-#include <KDE/KDialog>
+#include <KAuth>
+#include <QDialog>
 #include <QtCore/QString>
 
 class QTreeWidget;
-class KAction;
+class QAction;
 
 using namespace KAuth;
 
@@ -38,7 +38,7 @@ namespace UFW
 
 class Kcm;
 
-class LogViewer : public KDialog
+class LogViewer : public QDialog
 {
     Q_OBJECT
 
@@ -68,7 +68,7 @@ class LogViewer : public KDialog
     Action      viewAction;
     QString     lastLine;
     QTreeWidget *list;
-    KAction     *toggleRawAction,
+    QAction     *toggleRawAction,
                 *createRuleAction;
     bool        headerSizesSet;
 };
