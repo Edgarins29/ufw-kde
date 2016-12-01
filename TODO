@@ -1,3 +1,5 @@
+* Porting to KDE5 (so that everything should work as of stable KDE4 version)
+
 * KAuth calls should be asynch - KAuth seems to be broken!
 * Allow multiple item selection
   - Allow multiple move and delete
